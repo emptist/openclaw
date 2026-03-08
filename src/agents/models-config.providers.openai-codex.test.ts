@@ -106,6 +106,43 @@ describe("openai-codex implicit provider", () => {
     });
   });
 
+  it("preserves existing baseUrl when the api surface already matches", async () => {
+    await withModelsTempHome(async () => {
+      await withTempEnv(MODELS_CONFIG_IMPLICIT_ENV_VARS, async () => {
+        unsetEnv(MODELS_CONFIG_IMPLICIT_ENV_VARS);
+        const agentDir = resolveOpenClawAgentDir();
+        await writeCodexOauthProfile(agentDir);
+        await fs.writeFile(
+          path.join(agentDir, "models.json"),
+          JSON.stringify(
+            {
+              providers: {
+                "openai-codex": {
+                  baseUrl: "https://proxy.example/codex",
+                  api: "openai-codex-responses",
+                  models: [],
+                },
+              },
+            },
+            null,
+            2,
+          ),
+          "utf8",
+        );
+
+        await ensureOpenClawModelsJson({});
+
+        const parsed = await readGeneratedModelsJson<{
+          providers: Record<string, { baseUrl?: string; api?: string }>;
+        }>();
+        expect(parsed.providers["openai-codex"]).toMatchObject({
+          baseUrl: "https://proxy.example/codex",
+          api: "openai-codex-responses",
+        });
+      });
+    });
+  });
+
   it("preserves an existing baseUrl for explicit openai-codex config without oauth synthesis", async () => {
     await withModelsTempHome(async () => {
       await withTempEnv(MODELS_CONFIG_IMPLICIT_ENV_VARS, async () => {
