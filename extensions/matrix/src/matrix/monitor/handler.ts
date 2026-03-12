@@ -630,7 +630,7 @@ export function createMatrixRoomMessageHandler(params: MatrixMonitorHandlerParam
         SenderId: senderId,
         SenderUsername: senderId.split(":")[0]?.replace(/^@/, ""),
         GroupSubject: isRoom ? (roomName ?? roomId) : undefined,
-        GroupChannel: isRoom ? roomId : undefined,
+        GroupId: isRoom ? roomId : undefined,
         GroupSystemPrompt: isRoom ? groupSystemPrompt : undefined,
         Provider: "matrix" as const,
         Surface: "matrix" as const,

@@ -61,7 +61,7 @@ Wizard behavior that matters:
 - When you add another Matrix account interactively, the entered account name is normalized into the account ID used in config and env vars. For example, `Ops Bot` becomes `ops-bot`.
 - DM allowlist prompts accept full `@user:server` values immediately. Display names only work when live directory lookup finds one exact match; otherwise the wizard asks you to retry with a full Matrix ID.
 - Room allowlist prompts accept room IDs and aliases directly. They can also resolve joined-room names live, but unresolved names are only kept as typed during setup and are ignored later by runtime allowlist resolution. Prefer `!room:server` or `#alias:server`.
-- Runtime room/session identity uses the stable Matrix room ID. Room-declared aliases are only used as lookup inputs, not as the long-term session key or group channel identifier.
+- Runtime room/session identity uses the stable Matrix room ID. Room-declared aliases are only used as lookup inputs, not as the long-term session key or stable group identity.
 - To resolve room names before saving them, use `openclaw channels resolve --channel matrix "Project Room"`.
 
 Minimal token-based setup:
@@ -580,6 +580,6 @@ Live directory lookup uses the logged-in Matrix account:
 - `dm`: DM policy block (`enabled`, `policy`, `allowFrom`).
 - `dm.allowFrom` entries should be full Matrix user IDs unless you already resolved them through live directory lookup.
 - `accounts`: named per-account overrides. Top-level `channels.matrix` values act as defaults for these entries.
-- `groups`: per-room policy map. Prefer room IDs or aliases; unresolved room names are ignored at runtime. Session/group metadata uses the stable room ID after resolution.
+- `groups`: per-room policy map. Prefer room IDs or aliases; unresolved room names are ignored at runtime. Session/group identity uses the stable room ID after resolution, while human-readable labels still come from room names.
 - `rooms`: legacy alias for `groups`.
 - `actions`: per-action tool gating (`messages`, `reactions`, `pins`, `memberInfo`, `channelInfo`, `verification`).
