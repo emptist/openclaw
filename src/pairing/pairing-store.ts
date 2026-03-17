@@ -7,8 +7,11 @@ import type { ChannelId, ChannelPairingAdapter } from "../channels/plugins/types
 import { resolveOAuthDir, resolveStateDir } from "../config/paths.js";
 import { withFileLock as withPathLock } from "../infra/file-lock.js";
 import { resolveRequiredHomeDir } from "../infra/home-dir.js";
+import { createSubsystemLogger } from "../logging/subsystem.js";
 import { readJsonFileWithFallback, writeJsonFileAtomically } from "../plugin-sdk/json-store.js";
 import { DEFAULT_ACCOUNT_ID } from "../routing/session-key.js";
+
+const pairingStoreLogger = createSubsystemLogger("pairing:store");
 
 const PAIRING_CODE_LENGTH = 8;
 const PAIRING_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -473,7 +476,9 @@ async function writeAllowFromState(filePath: string, allowFrom: string[]): Promi
   let stat: Awaited<ReturnType<typeof fs.promises.stat>> | null = null;
   try {
     stat = await fs.promises.stat(filePath);
-  } catch {}
+  } catch (err) {
+    pairingStoreLogger.debug("failed to stat allowFrom file", { error: String(err), filePath });
+  }
   setAllowFromReadCache(filePath, {
     exists: true,
     mtimeMs: stat?.mtimeMs ?? null,

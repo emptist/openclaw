@@ -77,6 +77,11 @@ export default defineConfig({
     // Same rationale as unstubEnvs: avoid cross-test pollution under vmForks.
     unstubGlobals: true,
     pool: "forks",
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
     maxWorkers: isCI ? ciWorkers : localWorkers,
     include: [
       "src/**/*.test.ts",

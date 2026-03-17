@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import fsSync from "node:fs";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { createSubsystemLogger } from "../logging/subsystem.js";
 import { detectMime } from "../media/mime.js";
 import { runTasksWithConcurrency } from "../utils/run-with-concurrency.js";
 import { estimateStructuredEmbeddingInputBytes } from "./embedding-input-limits.js";
@@ -13,6 +14,8 @@ import {
   type MemoryMultimodalModality,
   type MemoryMultimodalSettings,
 } from "./multimodal.js";
+
+const memoryLogger = createSubsystemLogger("memory:internal");
 
 export type MemoryFileEntry = {
   path: string;
@@ -49,7 +52,9 @@ const DISABLED_MULTIMODAL_SETTINGS: MemoryMultimodalSettings = {
 export function ensureDir(dir: string): string {
   try {
     fsSync.mkdirSync(dir, { recursive: true });
-  } catch {}
+  } catch (err) {
+    memoryLogger.debug("failed to create directory", { error: String(err), dir });
+  }
   return dir;
 }
 

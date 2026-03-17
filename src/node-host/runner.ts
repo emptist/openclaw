@@ -12,6 +12,7 @@ import {
   NODE_SYSTEM_RUN_COMMANDS,
 } from "../infra/node-commands.js";
 import { ensureOpenClawCliOnPath } from "../infra/path-env.js";
+import { createSubsystemLogger } from "../logging/subsystem.js";
 import { GATEWAY_CLIENT_MODES, GATEWAY_CLIENT_NAMES } from "../utils/message-channel.js";
 import { VERSION } from "../version.js";
 import { ensureNodeHostConfig, saveNodeHostConfig, type NodeHostGatewayConfig } from "./config.js";
@@ -21,6 +22,8 @@ import {
   type SkillBinsProvider,
   buildNodeInvokeResultParams,
 } from "./invoke.js";
+
+const nodeHostLogger = createSubsystemLogger("node-host:runner");
 
 export { buildNodeInvokeResultParams };
 
@@ -174,8 +177,7 @@ export async function runNodeHost(opts: NodeHostRunOptions): Promise<void> {
   const scheme = gateway.tls ? "wss" : "ws";
   const url = `${scheme}://${host}:${port}`;
   const pathEnv = ensureNodePathEnv();
-  // eslint-disable-next-line no-console
-  console.log(`node host PATH: ${pathEnv}`);
+  nodeHostLogger.info("node host PATH", { path: pathEnv });
 
   const client = new GatewayClient({
     url,
